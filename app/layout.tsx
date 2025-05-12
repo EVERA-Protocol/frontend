@@ -5,6 +5,8 @@ import "./globals.css"
 // import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { Web3Provider } from "./Web3Provider"
+import AppShell from "@/components/app-shell"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,11 +25,11 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning>
       <body className={inter.className}>
         {/* <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange> */}
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+        <Web3Provider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </Web3Provider>
         {/* </ThemeProvider> */}
       </body>
     </html>
