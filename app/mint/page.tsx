@@ -15,7 +15,15 @@ import { useToast } from "@/hooks/use-toast"
 
 export default function MintPage() {
   const { toast } = useToast()
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    symbol: string;
+    institutionName: string;
+    institutionAddress: string;
+    supportingDocs: File | null;
+    totalSupply: string;
+    pricePerRWA: string;
+    description: string;
+  }>({
     symbol: "",
     institutionName: "",
     institutionAddress: "",
@@ -23,7 +31,7 @@ export default function MintPage() {
     totalSupply: "",
     pricePerRWA: "",
     description: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target

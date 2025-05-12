@@ -22,14 +22,16 @@ import {
 } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 
-export default function AssetDetailPage({ params }: { params: { id: string } }) {
+export default function AssetDetailPage() {
+  const { id } = useParams()
   const { toast } = useToast()
   const [buyAmount, setBuyAmount] = useState("")
   const [stakeAmount, setStakeAmount] = useState("")
 
   // In a real app, you would fetch this data from an API
-  const asset = mockAssets.find((a) => a.id === params.id) || mockAssets[0]
+  const asset = mockAssets.find((a) => a.id === id) || mockAssets[0]
 
   const handleBuy = () => {
     toast({
