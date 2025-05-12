@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, X, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
-import { ModeToggle } from "@/components/mode-toggle"
+// import { ModeToggle } from "@/components/mode-toggle"
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -46,7 +46,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 ml-auto">
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <Button className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
             Connect Wallet
           </Button>
