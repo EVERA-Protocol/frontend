@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, X, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import { ConnectButton } from "@xellar/kit"
 // import { ModeToggle } from "@/components/mode-toggle"
 
 const navItems = [
@@ -47,9 +48,10 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2 ml-auto">
           {/* <ModeToggle /> */}
-          <Button className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
+          {/* <Button className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
             Connect Wallet
-          </Button>
+          </Button> */}
+          <ConnectButton className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700" />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -84,9 +86,9 @@ export default function Navbar() {
                     {item.label}
                   </Link>
                 ))}
-                <Button className="mt-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
-                  Connect Wallet
-                </Button>
+                <ConnectButton className="mt-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700" />
+                {/* Connect Wallet
+                </Button> */}
               </nav>
             </SheetContent>
           </Sheet>
