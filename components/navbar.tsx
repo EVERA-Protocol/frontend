@@ -51,7 +51,7 @@ export default function Navbar() {
           {/* <Button className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
             Connect Wallet
           </Button> */}
-          <ConnectButton className="hidden md:flex bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700" />
+          <ConnectButton className="hidden md:flex" />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -86,7 +86,7 @@ export default function Navbar() {
                     {item.label}
                   </Link>
                 ))}
-                <ConnectButton className="mt-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700" />
+                <ConnectButton className="mt-4" />
                 {/* Connect Wallet
                 </Button> */}
               </nav>
