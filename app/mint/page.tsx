@@ -78,7 +78,7 @@ export default function MintPage() {
                           <Info className="h-4 w-4 text-gray-500" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p className="w-80">Symbol for your RWA token, e.g., "RERA" for Real Estate RWA</p>
+                          <p className="w-80">Symbol for your RWA token, e.g., &#34;RERA&#34; for Real Estate RWA</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
