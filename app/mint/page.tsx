@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -9,29 +10,41 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FileUpload } from "@/components/file-upload"
-import { ArrowRight, Info } from "lucide-react"
+import { ArrowRight, Info, Loader2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
+import { useAccount, useWriteContract } from "wagmi"
+import { wagmiContractLaunchpadConfig } from "@/services/contract"
+import { RWALaunchpadContract } from "@/services/contractAddress"
 
 export default function MintPage() {
   const { toast } = useToast()
+  const { isConnected } = useAccount()
+  const { writeContractAsync, isPending } = useWriteContract();
+
   const [formData, setFormData] = useState<{
+    name: string;
     symbol: string;
     institutionName: string;
     institutionAddress: string;
     supportingDocs: File | null;
+    supportingImage: File | null;
     totalSupply: string;
     pricePerRWA: string;
     description: string;
   }>({
+    name: "",
     symbol: "",
     institutionName: "",
     institutionAddress: "",
     supportingDocs: null,
+    supportingImage: null,
     totalSupply: "",
     pricePerRWA: "",
     description: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -42,9 +55,57 @@ export default function MintPage() {
     setFormData((prev) => ({ ...prev, supportingDocs: file }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageChange = (file: File | null) => {
+    setFormData((prev) => ({ ...prev, supportingImage: file }))
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const executeContract = async (config: any) => {
+    try {
+      await writeContractAsync(config);
+    } catch (error: any) {
+      console.error("Error creating RWA token:", error)
+      toast({
+        title: "Error creating RWA token",
+        description: error.message || "An unknown error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    setIsSubmitting(true)
     e.preventDefault()
     console.log("Form submitted:", formData)
+
+    const docs = new FormData();
+    if (formData.supportingDocs) docs.set("file", formData.supportingDocs);
+
+    const uploadRequestDocs = await fetch("/api/files", {
+      method: "POST",
+      body: docs,
+    });
+
+    const docsUrl = await uploadRequestDocs.json();
+
+    const img = new FormData();
+    if (formData.supportingImage) img.set("file", formData.supportingImage);
+
+    const uploadRequestImg = await fetch("/api/files", {
+      method: "POST",
+      body: img,
+    });
+
+    const imgUrl = await uploadRequestImg.json();
+
+    executeContract({
+      ...wagmiContractLaunchpadConfig,
+      functionName: 'createRWAToken',
+      args: [formData.name, formData.symbol, formData.institutionName, formData.institutionAddress, docsUrl, imgUrl, BigInt(formData.totalSupply), BigInt(formData.pricePerRWA), formData.description],
+    })
 
     // Simulate successful submission
     toast({
@@ -63,26 +124,26 @@ export default function MintPage() {
 
         <Card className="border-purple-800 bg-black/60 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Token Mint Form</CardTitle>
+            <CardTitle className="text-white">Token Mint Form</CardTitle>
             <CardDescription>Complete all required information to start the tokenization process</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
+            <form onSubmit={handleSubmit} className="space-y-6 text-white">
+              <div className="grid gap-4 md:grid-cols-2 items-start">
+                <div className="space-y-2 text-white">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Your asset name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="border-purple-800 bg-black/60"
+                    required
+                  />
+                </div>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="symbol">RWA Symbol</Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-gray-500" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="w-80">Symbol for your RWA token, e.g., &#34;RERA&#34; for Real Estate RWA</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
+                  <Label htmlFor="symbol">RWA Symbol</Label>
                   <Input
                     id="symbol"
                     name="symbol"
@@ -93,21 +154,23 @@ export default function MintPage() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="institutionName">Institution Name</Label>
-                  <Input
-                    id="institutionName"
-                    name="institutionName"
-                    placeholder="Your company or institution name"
-                    value={formData.institutionName}
-                    onChange={handleChange}
-                    className="border-purple-800 bg-black/60"
-                    required
-                  />
-                </div>
               </div>
 
-              <div className="space-y-2">
+
+              <div className="space-y-2 text-white">
+                <Label htmlFor="institutionName">Institution Name</Label>
+                <Input
+                  id="institutionName"
+                  name="institutionName"
+                  placeholder="Your company or institution name"
+                  value={formData.institutionName}
+                  onChange={handleChange}
+                  className="border-purple-800 bg-black/60"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2 text-white">
                 <Label htmlFor="institutionAddress">Institution Address</Label>
                 <Input
                   id="institutionAddress"
@@ -120,12 +183,18 @@ export default function MintPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Supporting Documents</Label>
-                <FileUpload onFileChange={handleFileChange} />
+              <div className="grid gap-4 md:grid-cols-2 items-start">
+                <div className="space-y-2 text-white">
+                  <Label>Supporting Documents</Label>
+                  <FileUpload onFileChange={handleFileChange} />
+                </div>
+                <div className="space-y-2 text-white">
+                  <Label>Supporting Image</Label>
+                  <FileUpload onFileChange={handleImageChange} />
+                </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2 text-white">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="totalSupply">Total RWA Supply</Label>
@@ -196,9 +265,21 @@ export default function MintPage() {
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                  disabled={isSubmitting || isPending || !isConnected}
                 >
-                  Submit Mint Request <ArrowRight className="ml-2 h-4 w-4" />
+                  {(isSubmitting || isPending) ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+                    </>
+                  ) : (
+                    <>
+                      Submit Mint Request <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
+                {!isConnected && (
+                  <p className="mt-2 text-xs text-amber-500">Please connect your wallet to submit a mint request</p>
+                )}
               </div>
             </form>
           </CardContent>
@@ -207,6 +288,9 @@ export default function MintPage() {
               By submitting this form, you agree that the EVERA team will review your request and may contact you for
               additional information before proceeding with the tokenization process.
             </p>
+            <div className="mt-4 text-xs text-gray-500">
+              <span>Contract Address: {RWALaunchpadContract}</span>
+            </div>
           </CardFooter>
         </Card>
       </div>
