@@ -36,7 +36,7 @@ export default function Home() {
                 Start Minting <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-purple-500 text-white hover:bg-purple-950">
+            <Button asChild variant="outline" size="lg" className="border-purple-500 text-purple-500 hover:bg-purple-950 hover:text-white">
               <Link href="/explore">Explore Assets</Link>
             </Button>
           </div>
