@@ -23,12 +23,14 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { TransactionSuccess } from "@/components/transaction-success"
 
 export default function AssetDetailPage() {
   const { id } = useParams()
   const { toast } = useToast()
   const [buyAmount, setBuyAmount] = useState("")
   const [stakeAmount, setStakeAmount] = useState("")
+  const [isStakingSuccess, setIsStakingSuccess] = useState(false)
 
   // In a real app, you would fetch this data from an API
   const asset = mockAssets.find((a) => a.id === id) || mockAssets[0]
@@ -41,10 +43,20 @@ export default function AssetDetailPage() {
   }
 
   const handleStake = () => {
-    toast({
-      title: "Staking successful!",
-      description: `You have staked ${stakeAmount} ${asset.symbol}`,
-    })
+    // In a real app, this would call an API to stake the tokens
+    console.log("Staking tokens:", stakeAmount)
+
+    // Show success state
+    setIsStakingSuccess(true)
+
+    // Reset after 3 seconds
+    setTimeout(() => {
+      setIsStakingSuccess(false)
+      toast({
+        title: "Staking successful!",
+        description: `You have staked ${stakeAmount} ${asset.symbol}`,
+      })
+    }, 3000)
   }
 
   return (
@@ -251,7 +263,7 @@ export default function AssetDetailPage() {
                   </DialogTrigger>
                   <DialogContent className="border-purple-800 bg-black/95">
                     <DialogHeader>
-                      <DialogTitle>Confirm Purchase</DialogTitle>
+                      <DialogTitle className="text-white">Confirm Purchase</DialogTitle>
                       <DialogDescription>
                         You are about to purchase {asset.symbol} tokens from {asset.name}
                       </DialogDescription>
@@ -259,24 +271,24 @@ export default function AssetDetailPage() {
                     <div className="space-y-4 py-4">
                       <div className="flex items-center justify-between">
                         <span className="text-gray-400">Amount</span>
-                        <span className="font-medium">
+                        <span className="font-medium text-white">
                           {buyAmount || "0"} {asset.symbol}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-gray-400">Price per Token</span>
-                        <span className="font-medium">${asset.priceUsd.toFixed(2)}</span>
+                        <span className="font-medium text-white">${asset.priceUsd.toFixed(2)}</span>
                       </div>
                       <Separator className="my-2" />
                       <div className="flex items-center justify-between">
                         <span className="text-gray-400">Total</span>
-                        <span className="text-lg font-bold">
+                        <span className="text-lg font-bold text-white">
                           ${buyAmount ? (Number.parseFloat(buyAmount) * asset.priceUsd).toFixed(2) : "0.00"}
                         </span>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" className="border-gray-700">
+                      <Button onClick={close} variant="outline" className="border-gray-700">
                         Cancel
                       </Button>
                       <Button
@@ -364,12 +376,72 @@ export default function AssetDetailPage() {
                   </div>
                 </div>
 
-                <Button
-                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
-                  onClick={handleStake}
-                >
-                  Stake Now
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+                      Stake Now
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="border-cyan-800 bg-black/95">
+                    {isStakingSuccess ? (
+                      <TransactionSuccess
+                        message="Staking Successful!"
+                        subMessage={`You have staked ${stakeAmount} ${asset.symbol}`}
+                        onComplete={() => setIsStakingSuccess(false)}
+                      />
+                    ) : (
+                      <>
+                        <DialogHeader>
+                          <DialogTitle className="text-white">Confirm Staking</DialogTitle>
+                          <DialogDescription>
+                            You are about to stake {asset.symbol} tokens to validate this asset
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Amount</span>
+                            <span className="font-medium text-white">
+                              {stakeAmount || "0"} {asset.symbol}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Annual Yield</span>
+                            <span className="font-medium text-green-400">{asset.annualYield}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Lock Period</span>
+                            <span className="font-medium text-white">30 days</span>
+                          </div>
+                          <Separator className="my-2" />
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Estimated Monthly Rewards</span>
+                            <span className="text-lg font-bold text-white">
+                              {stakeAmount
+                                ? (
+                                  (Number.parseFloat(stakeAmount) * asset.priceUsd * asset.annualYield) /
+                                  100 /
+                                  12
+                                ).toFixed(2)
+                                : "0.00"}{" "}
+                              USD
+                            </span>
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" className="border-gray-700">
+                            Cancel
+                          </Button>
+                          <Button
+                            className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                            onClick={handleStake}
+                          >
+                            Confirm Staking
+                          </Button>
+                        </DialogFooter>
+                      </>
+                    )}
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>

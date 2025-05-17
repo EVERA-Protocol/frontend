@@ -15,7 +15,9 @@ const navItems = [
   { label: "Explore", href: "/explore" },
   { label: "Mint", href: "/mint" },
   { label: "Stake", href: "/stake" },
-];
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Docs", href: "/docs" },
+]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

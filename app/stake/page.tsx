@@ -128,7 +128,7 @@ export default function StakePage() {
         <div>
           <Card className="border-purple-800 bg-black/60 backdrop-blur-sm sticky top-4">
             <CardHeader>
-              <CardTitle>Stake to AVS Eigenlayer</CardTitle>
+              <CardTitle className="text-white">Stake to AVS Eigenlayer</CardTitle>
               <CardDescription>Validate assets and earn rewards</CardDescription>
             </CardHeader>
             <CardContent>
@@ -151,7 +151,7 @@ export default function StakePage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="stakeAmount">Stake Amount</Label>
+                  <Label htmlFor="stakeAmount" className="text-white">Stake Amount</Label>
                   <div className="relative">
                     <Input
                       id="stakeAmount"
