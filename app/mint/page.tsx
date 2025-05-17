@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FileUpload } from "@/components/file-upload"
-import { ArrowRight, Info, Loader2 } from "lucide-react"
+import { ArrowRight, ExternalLink, Info, Loader2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
 import { useAccount, useWriteContract } from "wagmi"
 import { wagmiContractLaunchpadConfig } from "@/services/contract"
 import { RWALaunchpadContract } from "@/services/contractAddress"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { TransactionSuccess } from "@/components/transaction-success"
 
 export default function MintPage() {
   const { toast } = useToast()
@@ -45,6 +47,7 @@ export default function MintPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -63,6 +66,7 @@ export default function MintPage() {
   const executeContract = async (config: any) => {
     try {
       await writeContractAsync(config);
+      setShowSuccessModal(true)
     } catch (error: any) {
       console.error("Error creating RWA token:", error)
       toast({
@@ -112,6 +116,25 @@ export default function MintPage() {
       title: "Mint request successfully submitted",
       description: "Our team will review your request within 24-48 hours.",
     })
+  }
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      symbol: "",
+      institutionName: "",
+      institutionAddress: "",
+      supportingDocs: null,
+      supportingImage: null,
+      totalSupply: "",
+      pricePerRWA: "",
+      description: "",
+    })
+  }
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false)
+    resetForm()
   }
 
   return (
@@ -294,6 +317,51 @@ export default function MintPage() {
           </CardFooter>
         </Card>
       </div>
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md border-purple-800 bg-black/90 backdrop-blur-sm">
+          <TransactionSuccess
+            message="Mint Request Submitted Successfully"
+            subMessage="Our team will review your request within 24-48 hours."
+          />
+
+          <div className="mt-2 space-y-4">
+            <div className="rounded-lg bg-purple-900/30 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm text-gray-400">Request ID</span>
+                <span className="font-mono text-sm text-white">RWA001</span>
+              </div>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm text-gray-400">Token Symbol</span>
+                <span className="font-mono text-sm text-white">{formData.symbol}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Status</span>
+                <span className="flex items-center text-sm text-yellow-400">
+                  <span className="mr-1 h-2 w-2 rounded-full bg-yellow-400"></span>
+                  Pending Review
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+              <Button
+                variant="outline"
+                className="flex-1 border-purple-800 bg-transparent text-white hover:bg-purple-900/30"
+                onClick={handleCloseSuccessModal}
+              >
+                Close
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                onClick={handleCloseSuccessModal}
+              >
+                View Dashboard <ExternalLink className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
