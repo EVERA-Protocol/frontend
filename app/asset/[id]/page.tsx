@@ -27,6 +27,7 @@ import { mockAssets } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -53,6 +54,7 @@ export default function AssetDetailPage() {
   const [buyAmount, setBuyAmount] = useState("");
   const [stakeAmount, setStakeAmount] = useState("");
   const [isStakingSuccess, setIsStakingSuccess] = useState(false);
+  const [isBuyDialogOpen, setIsBuyDialogOpen] = useState(false);
 
   // In a real app, you would fetch this data from an API
   const asset = mockAssets.find((a) => a.id === id) || mockAssets[0];
@@ -70,13 +72,14 @@ export default function AssetDetailPage() {
 
   // Prepare the buy transaction
   const { writeContract: buyTokens, data: buyData } = useContractWrite({
+    address: launchpadAddress as `0x${string}`,
     abi: launchpadAbi,
     functionName: "buyTokens",
   });
 
   // Wait for transaction to be mined
   const { isLoading: isBuyLoading, isSuccess: isBuySuccess } = useTransaction({
-    hash: buyData as `0x${string}`,
+    hash: buyData,
   });
 
   const handleBuy = async () => {
@@ -102,11 +105,8 @@ export default function AssetDetailPage() {
       // Convert amount to wei
       const amountInWei = parseEther(buyAmount);
 
-      console.log(amountInWei);
-
       // Call the contract to buy tokens
-      buyTokens({
-        address: launchpadAddress as `0x${string}`,
+      await buyTokens({
         args: [tokenAddress, amountInWei],
         value: amountInWei, // Send ETH with the transaction
       });
@@ -133,6 +133,7 @@ export default function AssetDetailPage() {
         description: `You have purchased ${buyAmount} ${asset.symbol}`,
       });
       setBuyAmount(""); // Reset the input
+      setIsBuyDialogOpen(false); // Close the dialog
     }
   }, [isBuySuccess, buyAmount, asset.symbol, toast]);
 
@@ -400,13 +401,20 @@ export default function AssetDetailPage() {
                   </div>
                 </div>
 
-                <Dialog>
+                <Dialog
+                  open={isBuyDialogOpen}
+                  onOpenChange={setIsBuyDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <Button className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
                       Buy Now
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="border-purple-800 bg-black/95">
+                  <DialogContent
+                    className={`border-purple-800 bg-black/95 ${
+                      isBuyDialogOpen ? "block" : "hidden"
+                    }`}
+                  >
                     <DialogHeader>
                       <DialogTitle className="text-white">
                         Confirm Purchase
@@ -444,9 +452,9 @@ export default function AssetDetailPage() {
                     </div>
                     <DialogFooter>
                       <Button
-                        onClick={() => {}}
                         variant="outline"
                         className="border-gray-700"
+                        onClick={() => setIsBuyDialogOpen(false)}
                       >
                         Cancel
                       </Button>
