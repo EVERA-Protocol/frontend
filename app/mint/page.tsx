@@ -62,7 +62,6 @@ export default function MintPage() {
     setFormData((prev) => ({ ...prev, supportingImage: file }))
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const executeContract = async (config: any) => {
     try {
       await writeContractAsync(config);
