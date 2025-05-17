@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -27,9 +28,11 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { TransactionSuccess } from "@/components/transaction-success"
 
 export default function DashboardPage() {
     const [isWalletConnected, setIsWalletConnected] = useState(true)
+    const [isClaimingSuccess, setIsClaimingSuccess] = useState(false)
     const { toast } = useToast()
 
     // Filter user's owned assets
@@ -70,6 +73,23 @@ export default function DashboardPage() {
                 </div>
             </div>
         )
+    }
+
+    const handleClaimRewards = (asset: any) => {
+        // In a real app, this would call an API to claim rewards
+        console.log("Claiming rewards")
+
+        // Show success state
+        setIsClaimingSuccess(true)
+
+        // Reset after 3 seconds and show toast
+        setTimeout(() => {
+            setIsClaimingSuccess(false)
+            toast({
+                title: "Rewards Claimed!",
+                description: `You have claimed ${asset.claimableRewards.toFixed(2)} ${asset.symbol} tokens`,
+            })
+        }, 3000)
     }
 
     return (
@@ -212,7 +232,7 @@ export default function DashboardPage() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            className="border-purple-800 hover:bg-purple-900/20"
+                                                            className="border-purple-800 hover:bg-purple-900/20 hover:text-white"
                                                             asChild
                                                         >
                                                             <Link href={`/asset/${asset.id}`}>View Asset</Link>
@@ -311,56 +331,62 @@ export default function DashboardPage() {
                                                     <div className="mt-4 sm:mt-0 flex gap-2">
                                                         <Dialog>
                                                             <DialogTrigger asChild>
-                                                                <Button variant="outline" size="sm" className="border-cyan-800 hover:bg-cyan-900/20">
+                                                                <Button variant="outline" size="sm" className="border-cyan-800 hover:bg-cyan-900/20 hover:text-white">
                                                                     Claim Rewards
                                                                 </Button>
                                                             </DialogTrigger>
                                                             <DialogContent className="border-cyan-800 bg-black/95">
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Claim Asset Rewards</DialogTitle>
-                                                                    <DialogDescription>
-                                                                        You are about to claim rewards for {asset.symbol}
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <div className="space-y-4 py-4">
-                                                                    <div className="rounded-lg bg-cyan-900/20 p-4">
-                                                                        <div className="flex items-center justify-between mb-2">
-                                                                            <span className="text-gray-300">Claimable Rewards</span>
-                                                                            <span className="font-medium text-white">
-                                                                                {asset.claimableRewards.toFixed(2)} {asset.symbol}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="flex items-center justify-between">
-                                                                            <span className="text-gray-300">Value</span>
-                                                                            <span className="font-medium text-white">
-                                                                                ${(asset.claimableRewards * asset.priceUsd).toFixed(2)}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
+                                                                {isClaimingSuccess ? (
+                                                                    <TransactionSuccess
+                                                                        message="Rewards Claimed Successfully!"
+                                                                        subMessage={`You have claimed ${asset.claimableRewards.toFixed(2)} ${asset.symbol} tokens worth $${(asset.claimableRewards * asset.priceUsd).toFixed(2)}`}
+                                                                        onComplete={() => setIsClaimingSuccess(false)}
+                                                                    />
+                                                                ) : (
+                                                                    <>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>Claim Asset Rewards</DialogTitle>
+                                                                            <DialogDescription>
+                                                                                You are about to claim rewards for {asset.symbol}
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+                                                                        <div className="space-y-4 py-4">
+                                                                            <div className="rounded-lg bg-cyan-900/20 p-4">
+                                                                                <div className="flex items-center justify-between mb-2">
+                                                                                    <span className="text-gray-300">Claimable Rewards</span>
+                                                                                    <span className="font-medium text-white">
+                                                                                        {asset.claimableRewards.toFixed(2)} {asset.symbol}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="text-gray-300">Value</span>
+                                                                                    <span className="font-medium text-white">
+                                                                                        ${(asset.claimableRewards * asset.priceUsd).toFixed(2)}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
 
-                                                                    <Separator className="my-2" />
+                                                                            <Separator className="my-2" />
 
-                                                                    <div className="text-xs text-gray-400">
-                                                                        Claiming rewards will reset your reward counter for this asset. You will continue to
-                                                                        earn rewards based on your staked amount.
-                                                                    </div>
-                                                                </div>
-                                                                <DialogFooter>
-                                                                    <Button variant="outline" className="border-gray-700">
-                                                                        Cancel
-                                                                    </Button>
-                                                                    <Button
-                                                                        className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
-                                                                        onClick={() => {
-                                                                            toast({
-                                                                                title: "Rewards Claimed!",
-                                                                                description: `You have claimed ${asset.claimableRewards.toFixed(2)} ${asset.symbol} tokens`,
-                                                                            })
-                                                                        }}
-                                                                    >
-                                                                        Confirm Claim
-                                                                    </Button>
-                                                                </DialogFooter>
+                                                                            <div className="text-xs text-gray-400">
+                                                                                Claiming rewards will reset your reward counter for this asset. You will continue to
+                                                                                earn rewards based on your staked amount.
+                                                                            </div>
+                                                                        </div>
+                                                                        <DialogFooter>
+                                                                            <Button variant="outline" className="border-gray-700">
+                                                                                Cancel
+                                                                            </Button>
+                                                                            <Button
+                                                                                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                                                                                onClick={() => handleClaimRewards(asset)}
+                                                                            >
+                                                                                Confirm Claim
+                                                                            </Button>
+                                                                        </DialogFooter>
+                                                                    </>
+                                                                )}
+
                                                             </DialogContent>
                                                         </Dialog>
                                                         <Button
