@@ -43,9 +43,9 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { TransactionSuccess } from "@/components/transaction-success";
-import { useWriteContract, useReadContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt, useSendTransaction } from "wagmi";
 import { parseEther } from "viem";
-import { launchpadAbi } from "@/services/abi";
+// import { launchpadAbi } from "@/services/abi";
 
 export default function AssetDetailPage() {
   const { id } = useParams();
@@ -53,7 +53,8 @@ export default function AssetDetailPage() {
   const [buyAmount, setBuyAmount] = useState("");
   const [stakeAmount, setStakeAmount] = useState("");
   const [isStakingSuccess, setIsStakingSuccess] = useState(false);
-  const { writeContractAsync } = useWriteContract()
+  // const { writeContractAsync } = useWriteContract();
+  const { sendTransactionAsync } = useSendTransaction();
   const [buyTxHash, setBuyTxHash] = useState<`0x${string}` | undefined>();
 
   // In a real app, you would fetch this data from an API
@@ -63,14 +64,15 @@ export default function AssetDetailPage() {
   const launchpadAddress = process.env.NEXT_PUBLIC_CONTRACT_RWA_LAUNCHPAD;
 
   // Get token address from launchpad contract
-  const { data: tokenAddress } = useReadContract({
-    address: launchpadAddress as `0x${string}`,
-    abi: launchpadAbi,
-    functionName: "getRWATokenAtIndex",
-    args: [BigInt(Number(id))],
-  });
+  // const { data: tokenAddress } = useReadContract({
+  //   address: launchpadAddress as `0x${string}`,
+  //   abi: launchpadAbi,
+  //   functionName: "getRWATokenAtIndex",
+  //   args: [BigInt(Number(id))],
+  // });
 
   const handleBuy = async () => {
+    // Validate input
     if (!buyAmount || Number(buyAmount) <= 0) {
       toast({
         title: "Invalid amount",
@@ -80,10 +82,10 @@ export default function AssetDetailPage() {
       return;
     }
 
-    if (!tokenAddress) {
+    if (!launchpadAddress) {
       toast({
         title: "Error",
-        description: "Token address not found",
+        description: "Launchpad address not configured",
         variant: "destructive",
       });
       return;
@@ -93,39 +95,43 @@ export default function AssetDetailPage() {
       // Convert amount to wei
       const amountInWei = parseEther(buyAmount);
 
-      console.log(amountInWei);
+      console.log(`Sending ${amountInWei} wei to ${launchpadAddress}`);
 
-      // Call the contract to buy tokens
-      const tx = await writeContractAsync({
-        address: launchpadAddress as `0x${string}`,
-        abi: launchpadAbi,
-        functionName: "buyTokens",
-        args: [tokenAddress, amountInWei],
+      // Simple ETH transfer to launchpad address - no contract function call
+      const tx = await sendTransactionAsync({
+        to: launchpadAddress as `0x${string}`,
         value: amountInWei,
       });
 
       toast({
         title: "Transaction submitted",
-        description: "Your purchase is being processed",
+        description: "Your ETH has been sent",
       });
 
-      setBuyTxHash(tx)
+      setBuyTxHash(tx);
     } catch (error) {
       console.error("Buy error:", error);
+
+      // More specific error handling
+      let errorMessage = "There was an error processing your purchase";
+
+      // Check for common errors
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Transaction failed",
-        description: "There was an error processing your purchase",
+        description: errorMessage,
         variant: "destructive",
       });
     }
   };
 
-  const {
-    isLoading: isBuyLoading,
-    isSuccess: isBuySuccess,
-  } = useWaitForTransactionReceipt({
-    hash: buyTxHash,
-  });
+  const { isLoading: isBuyLoading, isSuccess: isBuySuccess } =
+    useWaitForTransactionReceipt({
+      hash: buyTxHash,
+    });
 
   // Show success message when transaction is confirmed
   useEffect(() => {
@@ -395,8 +401,8 @@ export default function AssetDetailPage() {
                       $
                       {buyAmount
                         ? (
-                          Number.parseFloat(buyAmount) * asset.priceUsd
-                        ).toFixed(2)
+                            Number.parseFloat(buyAmount) * asset.priceUsd
+                          ).toFixed(2)
                         : "0.00"}
                     </span>
                   </div>
@@ -438,15 +444,15 @@ export default function AssetDetailPage() {
                           $
                           {buyAmount
                             ? (
-                              Number.parseFloat(buyAmount) * asset.priceUsd
-                            ).toFixed(2)
+                                Number.parseFloat(buyAmount) * asset.priceUsd
+                              ).toFixed(2)
                             : "0.00"}
                         </span>
                       </div>
                     </div>
                     <DialogFooter>
                       <Button
-                        onClick={() => { }}
+                        onClick={() => {}}
                         variant="outline"
                         className="border-gray-700"
                       >
@@ -547,11 +553,11 @@ export default function AssetDetailPage() {
                     <span className="font-medium text-white">
                       {stakeAmount
                         ? (
-                          (Number.parseFloat(stakeAmount) *
-                            asset.priceUsd *
-                            asset.annualYield) /
-                          100
-                        ).toFixed(2)
+                            (Number.parseFloat(stakeAmount) *
+                              asset.priceUsd *
+                              asset.annualYield) /
+                            100
+                          ).toFixed(2)
                         : "0.00"}{" "}
                       USD
                     </span>
@@ -609,12 +615,12 @@ export default function AssetDetailPage() {
                             <span className="text-lg font-bold text-white">
                               {stakeAmount
                                 ? (
-                                  (Number.parseFloat(stakeAmount) *
-                                    asset.priceUsd *
-                                    asset.annualYield) /
-                                  100 /
-                                  12
-                                ).toFixed(2)
+                                    (Number.parseFloat(stakeAmount) *
+                                      asset.priceUsd *
+                                      asset.annualYield) /
+                                    100 /
+                                    12
+                                  ).toFixed(2)
                                 : "0.00"}{" "}
                               USD
                             </span>
