@@ -1,5 +1,6 @@
 import Footer from "./footer";
 import Navbar from "./navbar";
+import { Toaster } from "./ui/toaster";
 
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -9,6 +10,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       {/* Main content area */}
       {children}
       <Footer />
+      <Toaster />
     </main>
   );
 };
