@@ -43,7 +43,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { TransactionSuccess } from "@/components/transaction-success";
-import { useContractWrite, useContractRead, useTransaction } from "wagmi";
+import { useWriteContract, useReadContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 import { launchpadAbi } from "@/services/abi";
 
@@ -53,6 +53,8 @@ export default function AssetDetailPage() {
   const [buyAmount, setBuyAmount] = useState("");
   const [stakeAmount, setStakeAmount] = useState("");
   const [isStakingSuccess, setIsStakingSuccess] = useState(false);
+  const { writeContractAsync } = useWriteContract()
+  const [buyTxHash, setBuyTxHash] = useState<`0x${string}` | undefined>();
 
   // In a real app, you would fetch this data from an API
   const asset = mockAssets.find((a) => a.id === id) || mockAssets[0];
@@ -61,22 +63,11 @@ export default function AssetDetailPage() {
   const launchpadAddress = process.env.NEXT_PUBLIC_CONTRACT_RWA_LAUNCHPAD;
 
   // Get token address from launchpad contract
-  const { data: tokenAddress } = useContractRead({
+  const { data: tokenAddress } = useReadContract({
     address: launchpadAddress as `0x${string}`,
     abi: launchpadAbi,
     functionName: "getRWATokenAtIndex",
     args: [BigInt(Number(id))],
-  });
-
-  // Prepare the buy transaction
-  const { writeContract: buyTokens, data: buyData } = useContractWrite({
-    abi: launchpadAbi,
-    functionName: "buyTokens",
-  });
-
-  // Wait for transaction to be mined
-  const { isLoading: isBuyLoading, isSuccess: isBuySuccess } = useTransaction({
-    hash: buyData as `0x${string}`,
   });
 
   const handleBuy = async () => {
@@ -105,16 +96,20 @@ export default function AssetDetailPage() {
       console.log(amountInWei);
 
       // Call the contract to buy tokens
-      buyTokens({
+      const tx = await writeContractAsync({
         address: launchpadAddress as `0x${string}`,
+        abi: launchpadAbi,
+        functionName: "buyTokens",
         args: [tokenAddress, amountInWei],
-        value: amountInWei, // Send ETH with the transaction
+        value: amountInWei,
       });
 
       toast({
         title: "Transaction submitted",
         description: "Your purchase is being processed",
       });
+
+      setBuyTxHash(tx)
     } catch (error) {
       console.error("Buy error:", error);
       toast({
@@ -125,6 +120,13 @@ export default function AssetDetailPage() {
     }
   };
 
+  const {
+    isLoading: isBuyLoading,
+    isSuccess: isBuySuccess,
+  } = useWaitForTransactionReceipt({
+    hash: buyTxHash,
+  });
+
   // Show success message when transaction is confirmed
   useEffect(() => {
     if (isBuySuccess) {
@@ -132,7 +134,7 @@ export default function AssetDetailPage() {
         title: "Purchase successful!",
         description: `You have purchased ${buyAmount} ${asset.symbol}`,
       });
-      setBuyAmount(""); // Reset the input
+      setBuyAmount("");
     }
   }, [isBuySuccess, buyAmount, asset.symbol, toast]);
 
@@ -393,8 +395,8 @@ export default function AssetDetailPage() {
                       $
                       {buyAmount
                         ? (
-                            Number.parseFloat(buyAmount) * asset.priceUsd
-                          ).toFixed(2)
+                          Number.parseFloat(buyAmount) * asset.priceUsd
+                        ).toFixed(2)
                         : "0.00"}
                     </span>
                   </div>
@@ -436,15 +438,15 @@ export default function AssetDetailPage() {
                           $
                           {buyAmount
                             ? (
-                                Number.parseFloat(buyAmount) * asset.priceUsd
-                              ).toFixed(2)
+                              Number.parseFloat(buyAmount) * asset.priceUsd
+                            ).toFixed(2)
                             : "0.00"}
                         </span>
                       </div>
                     </div>
                     <DialogFooter>
                       <Button
-                        onClick={() => {}}
+                        onClick={() => { }}
                         variant="outline"
                         className="border-gray-700"
                       >
@@ -545,11 +547,11 @@ export default function AssetDetailPage() {
                     <span className="font-medium text-white">
                       {stakeAmount
                         ? (
-                            (Number.parseFloat(stakeAmount) *
-                              asset.priceUsd *
-                              asset.annualYield) /
-                            100
-                          ).toFixed(2)
+                          (Number.parseFloat(stakeAmount) *
+                            asset.priceUsd *
+                            asset.annualYield) /
+                          100
+                        ).toFixed(2)
                         : "0.00"}{" "}
                       USD
                     </span>
@@ -607,12 +609,12 @@ export default function AssetDetailPage() {
                             <span className="text-lg font-bold text-white">
                               {stakeAmount
                                 ? (
-                                    (Number.parseFloat(stakeAmount) *
-                                      asset.priceUsd *
-                                      asset.annualYield) /
-                                    100 /
-                                    12
-                                  ).toFixed(2)
+                                  (Number.parseFloat(stakeAmount) *
+                                    asset.priceUsd *
+                                    asset.annualYield) /
+                                  100 /
+                                  12
+                                ).toFixed(2)
                                 : "0.00"}{" "}
                               USD
                             </span>

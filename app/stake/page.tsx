@@ -1,27 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowRight, Clock, Shield, TrendingUp } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
+import { Clock, Shield, TrendingUp } from "lucide-react";
+// import { Progress } from "@/components/ui/progress";
+// import { Separator } from "@/components/ui/separator";
 import { mockAssets } from "@/lib/mock-data";
 import { AssetCard } from "@/components/asset-card";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 
 export default function StakePage() {
-  const { toast } = useToast();
-  const [stakeAmount, setStakeAmount] = useState("");
+  // const { toast } = useToast();
+  // const [stakeAmount, setStakeAmount] = useState("");
 
   // Filter assets with highest yield
   const highYieldAssets = [...mockAssets]
@@ -35,12 +35,12 @@ export default function StakePage() {
     )
     .slice(0, 3);
 
-  const handleStake = () => {
-    toast({
-      title: "Staking successful!",
-      description: "You have successfully staked to AVS Eigenlayer",
-    });
-  };
+  // const handleStake = () => {
+  //   toast({
+  //     title: "Staking successful!",
+  //     description: "You have successfully staked to AVS Eigenlayer",
+  //   });
+  // };
 
   return (
     <div className="container mx-auto py-12 px-4">
