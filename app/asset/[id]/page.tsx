@@ -171,7 +171,7 @@ export default function AssetDetailPage() {
                             {staker.address.slice(0, 6)}...{staker.address.slice(-4)}
                           </div>
                           <div className="text-sm text-gray-400">
-                            {staker.amount.toLocaleString()} {asset.symbol}
+                            {staker.amount.toLocaleString()} ETH
                           </div>
                         </div>
                       </div>
@@ -194,7 +194,7 @@ export default function AssetDetailPage() {
         <div className="space-y-6">
           <Card className="border-purple-800 bg-black/60 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Buy Tokens</CardTitle>
+              <CardTitle className="text-white">Buy Tokens</CardTitle>
               <CardDescription>Invest in this asset</CardDescription>
             </CardHeader>
             <CardContent>
@@ -218,7 +218,7 @@ export default function AssetDetailPage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="buyAmount">Amount</Label>
+                  <Label htmlFor="buyAmount" className="text-white">Amount</Label>
                   <div className="relative">
                     <Input
                       id="buyAmount"
@@ -226,10 +226,10 @@ export default function AssetDetailPage() {
                       placeholder="0"
                       value={buyAmount}
                       onChange={(e) => setBuyAmount(e.target.value)}
-                      className="pr-16 border-purple-800 bg-black/60"
+                      className="pr-16 border-purple-800 bg-black/60 text-white"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span className="text-sm text-gray-400">{asset.symbol}</span>
+                      <span className="text-sm text-gray-400">ETH</span>
                     </div>
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export default function AssetDetailPage() {
           <Card className="border-cyan-800 bg-black/60 backdrop-blur-sm">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <CardTitle>Stake Tokens</CardTitle>
+                <CardTitle className="text-white">Stake Tokens</CardTitle>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -336,7 +336,7 @@ export default function AssetDetailPage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="stakeAmount">Stake Amount</Label>
+                  <Label htmlFor="stakeAmount" className="text-white">Stake Amount</Label>
                   <div className="relative">
                     <Input
                       id="stakeAmount"
@@ -344,10 +344,10 @@ export default function AssetDetailPage() {
                       placeholder="0"
                       value={stakeAmount}
                       onChange={(e) => setStakeAmount(e.target.value)}
-                      className="pr-16 border-cyan-800 bg-black/60"
+                      className="pr-16 border-cyan-800 bg-black/60 text-white"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span className="text-sm text-gray-400">{asset.symbol}</span>
+                      <span className="text-sm text-gray-400">ETH</span>
                     </div>
                   </div>
                 </div>
@@ -376,7 +376,7 @@ export default function AssetDetailPage() {
 
           <Card className="border-gray-800 bg-black/60 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Contract Information</CardTitle>
+              <CardTitle className="text-white">Contract Information</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

@@ -162,7 +162,7 @@ export default function StakePage() {
                       className="pr-16 border-purple-800 bg-black/60"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span className="text-sm text-gray-400">EVERA</span>
+                      <span className="text-sm text-gray-400">ETH</span>
                     </div>
                   </div>
                 </div>
