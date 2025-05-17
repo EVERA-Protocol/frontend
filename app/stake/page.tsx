@@ -1,43 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowRight, Clock, Shield, TrendingUp } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { mockAssets } from "@/lib/mock-data"
-import { AssetCard } from "@/components/asset-card"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowRight, Clock, Shield, TrendingUp } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { mockAssets } from "@/lib/mock-data";
+import { AssetCard } from "@/components/asset-card";
+import { useToast } from "@/hooks/use-toast";
 
 export default function StakePage() {
-  const { toast } = useToast()
-  const [stakeAmount, setStakeAmount] = useState("")
+  const { toast } = useToast();
+  const [stakeAmount, setStakeAmount] = useState("");
 
   // Filter assets with highest yield
-  const highYieldAssets = [...mockAssets].sort((a, b) => b.annualYield - a.annualYield).slice(0, 3)
+  const highYieldAssets = [...mockAssets]
+    .sort((a, b) => b.annualYield - a.annualYield)
+    .slice(0, 3);
 
   // Filter assets with lowest validation (staked amount)
   const needsValidationAssets = [...mockAssets]
-    .sort((a, b) => a.stakedAmount / a.totalSupply - b.stakedAmount / b.totalSupply)
-    .slice(0, 3)
+    .sort(
+      (a, b) => a.stakedAmount / a.totalSupply - b.stakedAmount / b.totalSupply
+    )
+    .slice(0, 3);
 
   const handleStake = () => {
     toast({
       title: "Staking successful!",
       description: "You have successfully staked to AVS Eigenlayer",
-    })
-  }
+    });
+  };
 
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-white md:text-4xl">AVS Eigenlayer Staking</h1>
+        <h1 className="text-3xl font-bold text-white md:text-4xl">
+          AVS Eigenlayer Staking
+        </h1>
         <p className="mt-2 mx-auto max-w-2xl text-gray-400">
-          Stake your tokens to AVS Eigenlayer to validate real-world assets and earn rewards
+          Stake your tokens to AVS Eigenlayer to validate real-world assets and
+          earn rewards
         </p>
       </div>
 
@@ -49,10 +62,14 @@ export default function StakePage() {
                 <Shield className="h-6 w-6 text-purple-300" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-semibold text-white">What is AVS Eigenlayer?</h2>
+                <h2 className="text-xl font-semibold text-white">
+                  What is AVS Eigenlayer?
+                </h2>
                 <p className="mt-1 text-gray-400">
-                  AVS (Actively Validated Services) Eigenlayer is a system that enables validation of real-world assets
-                  through staking. The more tokens staked on an asset, the higher the trust level for that asset.
+                  AVS (Actively Validated Services) Eigenlayer is a system that
+                  enables validation of real-world assets through staking. The
+                  more tokens staked on an asset, the higher the trust level for
+                  that asset.
                 </p>
               </div>
             </div>
@@ -75,8 +92,12 @@ export default function StakePage() {
             </TabsList>
             <TabsContent value="high-yield" className="pt-6">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-white">Assets with Highest Yield</h2>
-                <p className="text-gray-400">Stake on these assets to earn the highest annual yield</p>
+                <h2 className="text-xl font-semibold text-white">
+                  Assets with Highest Yield
+                </h2>
+                <p className="text-gray-400">
+                  Stake on these assets to earn the highest annual yield
+                </p>
               </div>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {highYieldAssets.map((asset) => (
@@ -86,8 +107,12 @@ export default function StakePage() {
             </TabsContent>
             <TabsContent value="needs-validation" className="pt-6">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-white">Assets Needing Validation</h2>
-                <p className="text-gray-400">These assets need more staking to increase trust</p>
+                <h2 className="text-xl font-semibold text-white">
+                  Assets Needing Validation
+                </h2>
+                <p className="text-gray-400">
+                  These assets need more staking to increase trust
+                </p>
               </div>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {needsValidationAssets.map((asset) => (
@@ -98,35 +123,43 @@ export default function StakePage() {
           </Tabs>
 
           <div className="rounded-xl border border-cyan-800 bg-gradient-to-br from-cyan-900/20 to-blue-900/20 p-6">
-            <h2 className="mb-4 text-xl font-semibold text-white">Staking Benefits</h2>
+            <h2 className="mb-4 text-xl font-semibold text-white">
+              Staking Benefits
+            </h2>
             <div className="grid gap-6 md:grid-cols-3">
               <div className="space-y-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-900">
                   <TrendingUp className="h-5 w-5 text-cyan-300" />
                 </div>
                 <h3 className="font-medium text-white">Earn Yield</h3>
-                <p className="text-sm text-gray-400">Receive annual yield from assets you validate through staking</p>
+                <p className="text-sm text-gray-400">
+                  Receive annual yield from assets you validate through staking
+                </p>
               </div>
               <div className="space-y-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-900">
                   <Shield className="h-5 w-5 text-cyan-300" />
                 </div>
                 <h3 className="font-medium text-white">Increase Trust</h3>
-                <p className="text-sm text-gray-400">Help increase trust in tokenized real-world assets</p>
+                <p className="text-sm text-gray-400">
+                  Help increase trust in tokenized real-world assets
+                </p>
               </div>
               <div className="space-y-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-900">
                   <Clock className="h-5 w-5 text-cyan-300" />
                 </div>
                 <h3 className="font-medium text-white">Priority Access</h3>
-                <p className="text-sm text-gray-400">Get priority access to new assets being tokenized</p>
+                <p className="text-sm text-gray-400">
+                  Get priority access to new assets being tokenized
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         <div>
-          <Card className="border-purple-800 bg-black/60 backdrop-blur-sm sticky top-4">
+          {/* <Card className="border-purple-800 bg-black/60 backdrop-blur-sm sticky top-4">
             <CardHeader>
               <CardTitle className="text-white">Stake to AVS Eigenlayer</CardTitle>
               <CardDescription>Validate assets and earn rewards</CardDescription>
@@ -198,9 +231,9 @@ export default function StakePage() {
                 </p>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </div>
-  )
+  );
 }
