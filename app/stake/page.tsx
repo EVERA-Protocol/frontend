@@ -54,7 +54,7 @@ export default function StakePage() {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-8">
         <div className="lg:col-span-2">
           <div className="mb-8 rounded-xl border border-purple-800 bg-gradient-to-br from-purple-900/20 to-cyan-900/20 p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
